@@ -3,7 +3,8 @@ const colors = {
   button: "3E6259",   // brown "JM Lawn" text
   textField: "12563B",
   accent: "079C60",
-  text: "F7F4EB"    // green slogan text
+  text: "F7F4EB",    // green slogan text
+  appHeader: "26312A",
 
 
 };
