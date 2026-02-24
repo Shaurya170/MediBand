@@ -1,12 +1,12 @@
 import MyButton from '@/components/MyButton';
 import TextField from '@/components/TextField';
+import colors from '@/styles/colors';
 import { supabase } from '@/utils/supabase';
 import { Checkbox } from 'expo-checkbox';
 import React, { useEffect, useState } from 'react';
 import { Alert, AppState, AppStateStatus, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { default as Colors } from '../styles/colors';
-const Auth = () => {
+const signup = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showText, setShowText] = useState(false);
@@ -91,6 +91,7 @@ const Auth = () => {
     }
     }
 
+  
     return(
     <SafeAreaView style={styles.container}>
         <View style={styles.container}>
@@ -106,6 +107,7 @@ const Auth = () => {
                 onChangeText={setPassword}
                 secureTextEntry={!showText}
             />
+
           </View>
           <View style={styles.checkContainer}>
             <Text>Show Password</Text>
@@ -119,17 +121,10 @@ const Auth = () => {
             <MyButton
                 title = "Sign Up" 
                 onPress={handleAuthSignUp}
-                color = {Colors.white}
-                textColor = {Colors.black}
+                color = {colors.button}
+                textColor = {colors.text}
                 viewStyle={styles.buttonStyle}
                 
-            />
-            <MyButton
-                title = "Login" 
-                onPress={handleAuthSignIn}
-                color = {Colors.white}
-                textColor = {Colors.black}
-                viewStyle={styles.buttonStyle}
             />
           </View>
         </View>
@@ -138,11 +133,11 @@ const Auth = () => {
   )
 }
 
-export default Auth
+export default signup
 
 const styles = StyleSheet.create({
     container : {
-    backgroundColor: Colors.background,
+    backgroundColor: colors.background,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',

@@ -1,8 +1,10 @@
 //import AppHeader from "@/components/AppHeader";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 //import Auth from "../components/Auth";
+import MyButton from "@/components/MyButton";
+import colors from "@/styles/colors";
 import { useAuth } from "../components/AuthProvider";
 
 /*
@@ -37,8 +39,16 @@ export default function Index() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      
+    <View style={styles.container}>
+      <Text style={styles.header}>MediBand</Text>
+      <View>
+        <MyButton 
+        title="Sign Up"
+        onPress={() => router.push("/signup")}
+        viewStyle={styles.buttonStyle}
+        textStyle={styles.buttonText}
+        />
+      </View>
     </View>
   );
 }
@@ -47,11 +57,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "212922",
     flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+
   },
-  text:{
+  header:{
     fontSize: 70,
     fontFamily: "Jua",
     color: "F7F4EB"
+  },
+  buttonContainer:{
+    margin: 10,
+    padding: 8,
+
+  },
+  buttonStyle:{
+    backgroundColor: colors.button
+  },
+  buttonText:{
+    color: "F7F4EB",
+    fontFamily: "Jua",
+    fontSize: 30,
   }
 });
 
