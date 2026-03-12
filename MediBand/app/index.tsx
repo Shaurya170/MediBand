@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   header:{
     fontSize: 70,
     fontFamily: "Jua",
-    color: "F7F4EB"
+    color: colors.appHeader
   },
   buttonContainer:{
     margin: 10,
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.button
   },
   buttonText:{
-    color: "F7F4EB",
+    color: colors.text,
     fontFamily: "Jua",
     fontSize: 30,
   }
