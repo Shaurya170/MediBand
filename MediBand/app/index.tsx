@@ -1,29 +1,17 @@
-//import AppHeader from "@/components/AppHeader";
+import MyButton from "@/components/MyButton";
+import colors from "@/styles/colors";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-//import Auth from "../components/Auth";
-import MyButton from "@/components/MyButton";
-import colors from "@/styles/colors";
 import { useAuth } from "../components/AuthProvider";
 
-/*
-  This screen is the app's gatekeeper.
-
-  Logic:
-  - If auth is loading → show spinner
-  - If logged in → redirect to tabs
-  - If not logged in → show Auth UI
-*/
 export default function Index() {
   const router = useRouter();
   const { session, isLoading } = useAuth();
 
   useEffect(() => {
     if (session?.user) {
-      // Replace prevents going "back" to login screen
-      router.replace("/(tabs)/about");
-      console.log("in home page now")
+      router.replace("/(tabs)");
     }
   }, [router, session]);
 
@@ -32,60 +20,60 @@ export default function Index() {
   }
 
   if (session?.user) {
-    // Redirecting — nothing to render
-    console.log("null returned")
     return null;
-    
   }
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>MediBand</Text>
+
       <View style={styles.buttonContainer}>
-        <MyButton 
-        title="Sign Up"
-        onPress={() => router.push("/signup")}
-        viewStyle={styles.buttonStyle}
-        textStyle={styles.buttonText}
+        <MyButton
+          title="Sign Up"
+          onPress={() => router.push("/signup")}
+          viewStyle={styles.buttonStyle}
+          textStyle={styles.buttonText}
         />
-        <MyButton 
-        title="Login"
-        onPress={() => router.push("/login")}
-        viewStyle={styles.buttonStyle}
-        textStyle={styles.buttonText}
+
+        <MyButton
+          title="Login"
+          onPress={() => router.push("/login")}
+          viewStyle={styles.buttonStyle}
+          textStyle={styles.buttonText}
         />
       </View>
     </View>
   );
 }
-const styles = StyleSheet.create({
-  container:{
-    flex: 1,
-    backgroundColor: "212922",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#212922",
+    alignItems: "center",
+    justifyContent: "center"
   },
-  header:{
+
+  header: {
     fontSize: 70,
     fontFamily: "Jua",
     color: colors.appHeader
   },
-  buttonContainer:{
+
+  buttonContainer: {
     margin: 10,
     padding: 8,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
-  buttonStyle:{
+
+  buttonStyle: {
     backgroundColor: colors.button
   },
-  buttonText:{
+
+  buttonText: {
     color: colors.text,
     fontFamily: "Jua",
-    fontSize: 30,
+    fontSize: 30
   }
 });
-
-

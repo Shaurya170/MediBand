@@ -1,61 +1,58 @@
 import colors from '@/styles/colors';
 import React from 'react';
-import { StyleProp, StyleSheet, Text, TextStyle, TouchableHighlight, View, ViewStyle } from 'react-native';
-// defining the props the use of this component
-// is allowed to pass in , this lets the compent 
-// be reusable and customizable
-// this data thpe is defined befero the const line
+import {
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableHighlight,
+  ViewStyle
+} from 'react-native';
 
-type propsType = {
-  title: string; // notice the s is lower case. it is semicolon here. style is comma
+type PropsType = {
+  title: string;
+  onPress: () => void;
   color?: string;
   textColor?: string;
-  onPress: () => void;
   viewStyle?: StyleProp<ViewStyle>;
-  textStyle?: StyleProp<TextStyle>
-  
+  textStyle?: StyleProp<TextStyle>;
 };
 
-const MyButton: React.FC<propsType> = ({
+const MyButton: React.FC<PropsType> = ({
   title,
   onPress,
-  color = 'gray',
-  textColor = 'black',
+  color = colors.button,
+  textColor = colors.text,
   viewStyle,
-  textStyle,
-  
-  
+  textStyle
 }) => {
-
-
-return (
-  <View>
+  return (
     <TouchableHighlight
       onPress={onPress}
       underlayColor={colors.accent}
-      style={[viewStyle, {backgroundColor: colors.button}]}
+      style={[styles.button, { backgroundColor: color }, viewStyle]}
     >
-    <Text style={[textStyle, {color: colors.text}]}>{title}</Text>
+      <Text style={[styles.buttonText, { color: textColor }, textStyle]}>
+        {title}
+      </Text>
     </TouchableHighlight>
-  </View>
-  )
-}
+  );
+};
 
-export default MyButton
+export default MyButton;
 
 const styles = StyleSheet.create({
-    button:{
-        backgroundColor: colors.background,
-        height: 70,
-        width: 200,
-        borderWidth: 5,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 15,
-
-    },
-    buttonText: {
-      fontSize: 41,
-      color: colors.accent,
+  button: {
+    height: 70,
+    width: 200,
+    borderWidth: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 15
   },
-})
+
+  buttonText: {
+    fontSize: 28,
+    fontWeight: '600'
+  }
+});

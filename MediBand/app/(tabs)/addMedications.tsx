@@ -1,9 +1,110 @@
-import { Text, View } from "react-native";
+import MyButton from "@/components/MyButton";
+import TextField from "@/components/TextField";
+import colors from "@/styles/colors";
+import { supabase } from "@/utils/supabase";
+import React, { useState } from "react";
+import { Alert, StyleSheet, Text, View } from "react-native";
 
-export default function Medications() {
+export default function AddMedication() {
+
+  const [medication, setMedication] = useState("");
+  const [dosageAmount, setDosageAmount] = useState("");
+  const [dosageUnit, setDosageUnit] = useState("");
+
+  const addMedication = async () => {
+
+    if (!medication || !dosageAmount || !dosageUnit) {
+      Alert.alert("Error", "Please fill out all fields");
+      return;
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      Alert.alert("Error", "User not logged in");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("medications")
+      .insert({
+        medication: medication,
+        dosage_amount: Number(dosageAmount),
+        dosage_unit: dosageUnit,
+        user_id: user.id
+      });
+
+    if (error) {
+      Alert.alert("Error", error.message);
+    } else {
+      Alert.alert("Success", "Medication added");
+
+      setMedication("");
+      setDosageAmount("");
+      setDosageUnit("");
+    }
+  };
+
   return (
-    <View>
-      <Text>Your Medications</Text>
+    <View style={styles.container}>
+
+      <Text style={styles.title}>Add Medication</Text>
+
+      <TextField
+        placeholder="Medication Name"
+        value={medication}
+        onChangeText={setMedication}
+      />
+
+      <TextField
+        placeholder="Dosage Amount"
+        value={dosageAmount}
+        onChangeText={setDosageAmount}
+      />
+
+      <TextField
+        placeholder="Dosage Unit (mg, ml, pills)"
+        value={dosageUnit}
+        onChangeText={setDosageUnit}
+      />
+
+      <MyButton
+        title="Add Medication"
+        onPress={addMedication}
+        viewStyle={styles.button}
+        textStyle={styles.buttonText}
+      />
+
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.background,
+    gap: 20
+  },
+
+  title: {
+    fontSize: 32,
+    color: colors.text,
+    marginBottom: 20
+  },
+
+  button: {
+    width: 200,
+    height: 60,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 15
+  },
+
+  buttonText: {
+    fontSize: 22
+  }
+
+});
