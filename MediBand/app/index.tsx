@@ -1,4 +1,4 @@
-import MyButton from "@/components/MyButton";
+import Auth from "@/components/Auth";
 import colors from "@/styles/colors";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
@@ -26,22 +26,7 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>MediBand</Text>
-
-      <View style={styles.buttonContainer}>
-        <MyButton
-          title="Sign Up"
-          onPress={() => router.push("/signup")}
-          viewStyle={styles.buttonStyle}
-          textStyle={styles.buttonText}
-        />
-
-        <MyButton
-          title="Login"
-          onPress={() => router.push("/login")}
-          viewStyle={styles.buttonStyle}
-          textStyle={styles.buttonText}
-        />
-      </View>
+      <Auth />
     </View>
   );
 }
@@ -51,29 +36,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#212922",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
 
   header: {
     fontSize: 70,
     fontFamily: "Jua",
-    color: colors.appHeader
+    color: colors.text,
   },
 
   buttonContainer: {
     margin: 10,
     padding: 8,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
 
   buttonStyle: {
-    backgroundColor: colors.button
+    backgroundColor: colors.button,
   },
 
   buttonText: {
     color: colors.text,
     fontFamily: "Jua",
-    fontSize: 30
-  }
+    fontSize: 30,
+  },
 });
