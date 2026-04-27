@@ -1,6 +1,6 @@
-import colors from '@/styles/colors';
-import React from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import colors from "@/styles/colors";
+import React from "react";
+import { StyleSheet, TextInput, View } from "react-native";
 
 type InputProps = {
   placeholder: string;
@@ -9,41 +9,45 @@ type InputProps = {
   secureTextEntry?: boolean;
 };
 
-const TextField = ({placeholder, onChangeText, value, secureTextEntry}: InputProps) => {
-    
+const TextField = ({
+  placeholder,
+  onChangeText,
+  value,
+  secureTextEntry,
+}: InputProps) => {
   return (
     <View style={styles.textInputContainer}>
-      <TextInput 
-        style={[styles.textInput, {height: 52}, {width: 200}]}
-        placeholder ={placeholder}
+      <TextInput
+        style={[styles.textInput, { height: 52 }, { width: 200 }]}
+        placeholder={placeholder}
         placeholderTextColor={colors.text}
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}
       />
     </View>
-  )
-}
-export default TextField
+  );
+};
+export default TextField;
 
 const styles = StyleSheet.create({
-    textInputContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 3,
-    },
-    textInput: {
-        backgroundColor: colors.textField,
-        paddingLeft: 10,
-        paddingRight: 10,
-        paddingBottom: 5,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    text: {
-        borderColor: colors.accent,
-        alignItems: 'center',
-        justifyContent: 'center',
-    }
-    
-})
+  textInputContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 3,
+  },
+  textInput: {
+    backgroundColor: colors.textField,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingBottom: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 12,
+  },
+  text: {
+    borderColor: colors.accent,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

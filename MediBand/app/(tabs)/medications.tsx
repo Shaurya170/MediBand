@@ -3,14 +3,7 @@ import TextField from "@/components/TextField";
 import colors from "@/styles/colors";
 import { supabase } from "@/utils/supabase";
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Modal,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Alert, FlatList, Modal, StyleSheet, Text, View } from "react-native";
 
 type Medication = {
   id: string;
@@ -20,9 +13,7 @@ type Medication = {
 };
 
 export default function Medications() {
-
   const [medications, setMedications] = useState<Medication[]>([]);
-
   const [modalVisible, setModalVisible] = useState(false);
 
   const [editId, setEditId] = useState<string | null>(null);
@@ -36,7 +27,6 @@ export default function Medications() {
   }, []);
 
   async function fetchMedications() {
-
     const { data, error } = await supabase
       .from("medications")
       .select("*")
@@ -51,14 +41,12 @@ export default function Medications() {
   }
 
   function subscribeToChanges() {
-
     const channel = supabase
       .channel("medication-realtime")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "medications" },
         (payload) => {
-
           if (payload.eventType === "INSERT") {
             setMedications((prev) => [...prev, payload.new as Medication]);
           }
@@ -76,7 +64,6 @@ export default function Medications() {
               )
             );
           }
-
         }
       )
       .subscribe();
@@ -95,7 +82,6 @@ export default function Medications() {
   }
 
   async function saveEdit() {
-
     if (!editId) return;
 
     const updated = {
@@ -105,9 +91,7 @@ export default function Medications() {
     };
 
     setMedications((prev) =>
-      prev.map((m) =>
-        m.id === editId ? { ...m, ...updated } : m
-      )
+      prev.map((m) => (m.id === editId ? { ...m, ...updated } : m))
     );
 
     const { error } = await supabase
@@ -123,7 +107,6 @@ export default function Medications() {
   }
 
   function confirmDelete(id: string) {
-
     Alert.alert(
       "Delete Medication",
       "Are you sure you want to delete this medication?",
@@ -139,15 +122,9 @@ export default function Medications() {
   }
 
   async function deleteMedication(id: string) {
+    setMedications((prev) => prev.filter((m) => m.id !== id));
 
-    setMedications((prev) =>
-      prev.filter((m) => m.id !== id)
-    );
-
-    const { error } = await supabase
-      .from("medications")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("medications").delete().eq("id", id);
 
     if (error) {
       Alert.alert(error.message);
@@ -155,16 +132,15 @@ export default function Medications() {
   }
 
   function renderMedication({ item }: { item: Medication }) {
-
     return (
       <View style={styles.card}>
+        <Text style={styles.medText}>{item.medication}</Text>
 
-        <Text style={styles.medText}>
-          {item.medication} — {item.dosage_amount} {item.dosage_unit}
+        <Text style={styles.subText}>
+          {item.dosage_amount} {item.dosage_unit}
         </Text>
 
         <View style={styles.buttonRow}>
-
           <MyButton
             title="Edit"
             onPress={() => openEdit(item)}
@@ -175,36 +151,31 @@ export default function Medications() {
             title="Delete"
             onPress={() => confirmDelete(item.id)}
             viewStyle={styles.smallButton}
-            color="#b00020"
+            color="#ff3b30"
             textColor="white"
           />
-
         </View>
-
       </View>
     );
   }
 
   return (
-
     <View style={styles.container}>
-
-      <Text style={styles.title}>Your Medications</Text>
+      <Text style={styles.title}>Medications</Text>
 
       <FlatList
+        style={{ width: "100%" }}
+        contentContainerStyle={styles.listContent}
         data={medications}
         keyExtractor={(item) => item.id}
         renderItem={renderMedication}
+        showsVerticalScrollIndicator={false}
       />
 
-      {/* EDIT MODAL */}
-
+      {/* MODAL */}
       <Modal visible={modalVisible} transparent animationType="fade">
-
         <View style={styles.modalBackground}>
-
           <View style={styles.modalCard}>
-
             <Text style={styles.modalTitle}>Edit Medication</Text>
 
             <TextField
@@ -226,7 +197,6 @@ export default function Medications() {
             />
 
             <View style={styles.buttonRow}>
-
               <MyButton
                 title="Save"
                 onPress={saveEdit}
@@ -238,75 +208,99 @@ export default function Medications() {
                 onPress={() => setModalVisible(false)}
                 viewStyle={styles.smallButton}
               />
-
             </View>
-
           </View>
-
         </View>
-
       </Modal>
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    padding: 20,
+    alignItems: "center",
+    paddingTop: 60,
   },
 
   title: {
-    fontSize: 32,
-    marginBottom: 20,
+    fontSize: 34,
+    fontWeight: "600",
     color: colors.text,
+    marginBottom: 20,
+  },
+
+  listContent: {
+    alignItems: "center",
+    paddingBottom: 40,
   },
 
   card: {
-    backgroundColor: colors.textField,
-    padding: 15,
+    width: "90%",
+    backgroundColor: "white",
+    padding: 18,
+    borderRadius: 20,
     marginBottom: 15,
-    borderRadius: 10,
+
+    // iOS shadow
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+
+    // Android shadow
+    elevation: 3,
   },
 
   medText: {
     fontSize: 20,
-    marginBottom: 10,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+
+  subText: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 12,
   },
 
   buttonRow: {
     flexDirection: "row",
-    gap: 10,
+    justifyContent: "space-between",
   },
 
   smallButton: {
-    width: 100,
+    width: 120,
     height: 40,
-    borderWidth: 2,
+    borderRadius: 12,
+    borderWidth: 1.5,
   },
 
   modalBackground: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.4)",
+    backgroundColor: "rgba(0,0,0,0.3)",
   },
 
   modalCard: {
-    width: 300,
-    backgroundColor: colors.background,
+    width: "85%",
+    backgroundColor: "white",
     padding: 20,
-    borderRadius: 12,
-    alignItems: "center",
+    borderRadius: 20,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 5,
   },
 
   modalTitle: {
     fontSize: 22,
+    fontWeight: "600",
     marginBottom: 15,
-    color: colors.text,
+    textAlign: "center",
   },
-
 });

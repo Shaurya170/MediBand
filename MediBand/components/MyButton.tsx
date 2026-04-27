@@ -4,44 +4,38 @@ import {
   StyleSheet,
   Text,
   TextStyle,
-  TouchableHighlight,
-  View,
+  TouchableOpacity,
   ViewStyle,
 } from "react-native";
 import colors from "../styles/colors";
 
-// defining the props the use of this component
-// is allowed to pass in , this lets the compent
-// be reusable and customizable
-// this data thpe is defined befero the const line
-
-type propsType = {
-  title: string; // notice the s is lower case. it is semicolon here. style is comma
+type PropsType = {
+  title: string;
+  onPress: () => void;
   color?: string;
   textColor?: string;
-  onPress: () => void;
   viewStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
 };
 
-const MyButton: React.FC<propsType> = ({
+const MyButton: React.FC<PropsType> = ({
   title,
   onPress,
-  color = "gray",
-  textColor = "black",
+  color = colors.button,
+  textColor = colors.text,
   viewStyle,
   textStyle,
 }) => {
   return (
-    <View>
-      <TouchableHighlight
-        onPress={onPress}
-        underlayColor={colors.accent}
-        style={[viewStyle, { backgroundColor: colors.background }]}
-      >
-        <Text style={[textStyle, { color: "black" }]}>{title}</Text>
-      </TouchableHighlight>
-    </View>
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      style={[styles.button, { backgroundColor: color }, viewStyle]}
+    >
+      <Text style={[styles.buttonText, { color: textColor }, textStyle]}>
+        {title}
+      </Text>
+    </TouchableOpacity>
   );
 };
 
@@ -49,17 +43,15 @@ export default MyButton;
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: colors.button,
-    height: 70,
-    width: 200,
-    borderWidth: 5,
-    borderColor: colors.background,
+    height: 50,
+    width: 180,
+    borderRadius: 25,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 15,
   },
+
   buttonText: {
-    fontSize: 41,
-    color: colors.accent,
+    fontSize: 18,
+    fontWeight: "600",
   },
 });

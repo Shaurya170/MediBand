@@ -6,117 +6,106 @@ import AppHeader from "../../components/AppHeader";
 import { useAuth } from "../../components/AuthProvider";
 
 export default function TabsLayout() {
-    const { session } = useAuth();
-    // If session becomes null while inside tabs, render Auth in-place (no navigation)
-    // If session is null while inside the tabs navigator, render the Auth
-    // form in-place instead of attempting to force a navigation back to `/`.
-    // This keeps the app state intact and avoids brittle cross-navigator calls.
-    if (session === null) {
-        return (
-        <View style={{ flex: 1 }}>
-            <AppHeader />
-        </View>
-        );
-  }
-    return(
-        <View style={{flex: 1}}>
+  const { session } = useAuth();
+
+  if (session === null) {
+    return (
+      <View style={{ flex: 1 }}>
         <AppHeader />
-        <Tabs
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <AppHeader />
+
+      <Tabs
         screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.text,
-        tabBarInactiveTintColor: colors.accent,
-        headerStyle: {
-          backgroundColor: colors.appHeader,
-        },
-        headerShadowVisible: false,
-        headerTintColor: colors.appHeader,
-        tabBarStyle: {
-          backgroundColor: colors.appHeader,
-        },
-      }}
+          headerShown: false,
+
+          // ✅ Clean color system
+          tabBarActiveTintColor: colors.accent,
+          tabBarInactiveTintColor: colors.subText,
+
+          // ✅ Modern tab bar styling
+          tabBarStyle: {
+            backgroundColor: colors.card,
+            borderTopColor: colors.border,
+            borderTopWidth: 1,
+            height: 65,
+            paddingBottom: 8,
+          },
+
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: "500",
+          },
+        }}
       >
+        <Tabs.Screen
+          name="about"
+          options={{
+            tabBarLabel: "Home",
+            tabBarIcon: ({ focused, color }) => (
+              <Ionicons
+                name={focused ? "home" : "home-outline"}
+                size={24}
+                color={color}
+              />
+            ),
+          }}
+        />
 
         <Tabs.Screen
-            name="index"
-            options={{
-            headerTitle: "About",
-            tabBarLabel: "About", 
-            tabBarIcon: ({focused, color}) => (
-                <Ionicons 
-                name={focused ? "information-circle" : "information-circle-outline"}
-                size={24} 
-                color={color}
-                />
-            ),
-            
-            }}
-        />
-        <Tabs.Screen
-            name="medications"
-            options={{
-            headerTitle: "Medications",
-            tabBarLabel: "Medications", 
-            
-            tabBarIcon: ({focused, color}) => (
-                <Ionicons 
+          name="medications"
+          options={{
+            tabBarLabel: "Meds",
+            tabBarIcon: ({ focused, color }) => (
+              <Ionicons
                 name={focused ? "medkit" : "medkit-outline"}
-                size={24} 
+                size={24}
                 color={color}
-                />
+              />
             ),
-            }}
+          }}
         />
+
         <Tabs.Screen
-            name="addMedications"
-            options={{
-            headerTitle: "Add Medications",
-            tabBarLabel: "Add Medications", 
-            tabBarIcon: ({focused, color}) => ( 
-                <Ionicons
-                    name={focused ? "medical-sharp" : "medical-outline"}
-                    size={24}
-                    color={color}
-                />
+          name="addMedications"
+          options={{
+            tabBarLabel: "Add",
+            tabBarIcon: ({ focused, color }) => (
+              <Ionicons
+                name={focused ? "create" : "create-outline"}
+                size={24}
+                color={color}
+              />
             ),
-            }}
+          }}
         />
+
         <Tabs.Screen
-            name="editProfile"
-            options={{
-            headerTitle: "Profile",
-            tabBarLabel: "Profile", 
-            tabBarIcon: ({focused, color}) => (
-                <Ionicons 
+          name="editProfile"
+          options={{
+            tabBarLabel: "Profile",
+            tabBarIcon: ({ focused, color }) => (
+              <Ionicons
                 name={focused ? "person" : "person-outline"}
-                size={24} 
-                color={color} 
-                />
+                size={24}
+                color={color}
+              />
             ),
-            }}
+          }}
         />
-        <Tabs.Screen
-            name="about"
-            options={{
-            headerTitle: "Home",
-            tabBarLabel: "Home", 
-            tabBarIcon: ({focused, color}) => (
-                <Ionicons
-                    name={focused ? "home" : "home-outline"}
-                    size={24}
-                    color={color}
-                />
-            ),
-            }}
-        />
-        </Tabs>
-        </View>
-    )
+      </Tabs>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container:{
-        flex:1,
-        justifyContent: "center",
-    }
+  container: {
+    flex: 1,
+    justifyContent: "center",
+  },
 });

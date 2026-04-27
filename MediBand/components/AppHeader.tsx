@@ -12,10 +12,9 @@ import {
 } from "react-native";
 
 function getTitleFromPath(pathname: string) {
-
   if (pathname === "/") return "Welcome";
   if (pathname.includes("index")) return "Home";
-  if (pathname.includes("addMedications")) return "Create Medication";
+  if (pathname.includes("addMedications")) return "Add Medication";
   if (pathname.includes("medications")) return "Medications";
   if (pathname.includes("editProfile")) return "Edit Profile";
   if (pathname.includes("about")) return "About";
@@ -24,14 +23,11 @@ function getTitleFromPath(pathname: string) {
 }
 
 export default function AppHeader() {
-
   const pathname = usePathname();
   const title = getTitleFromPath(pathname);
 
   async function handleLogout() {
-
     try {
-
       const { error } = await supabase.auth.signOut();
 
       if (error) {
@@ -41,16 +37,13 @@ export default function AppHeader() {
 
       // Send user back to login screen
       router.replace("/");
-
     } catch (err: any) {
       Alert.alert("Logout failed", err?.message ?? "Unexpected error");
     }
-
   }
 
   return (
     <View style={styles.container}>
-
       {/* LEFT SIDE (LOGO) */}
       <View style={styles.leftContainer}>
         <Image
@@ -61,8 +54,9 @@ export default function AppHeader() {
 
       {/* RIGHT SIDE (TITLE + LOGOUT) */}
       <View style={styles.rightContainer}>
-
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title} numberOfLines={2}>
+          {title}
+        </Text>
 
         <TouchableHighlight
           onPress={handleLogout}
@@ -71,19 +65,16 @@ export default function AppHeader() {
         >
           <MaterialIcons name="logout" size={26} color={colors.text} />
         </TouchableHighlight>
-
       </View>
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     width: "100%",
     height: 120,
-    backgroundColor: colors.appHeader,
+    backgroundColor: colors.card,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -97,22 +88,25 @@ const styles = StyleSheet.create({
   },
 
   rightContainer: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    gap: 20,
+    justifyContent: "flex-end",
+    gap: 12,
+  },
+
+  title: {
+    color: colors.text,
+    fontSize: 32,
+    fontWeight: "600",
+    fontFamily: "Gill Sans",
+    letterSpacing: 0.5,
+    flexShrink: 1,
   },
 
   logo: {
     width: 90,
     height: 90,
-  },
-
-  title: {
-    color: colors.text,
-    fontSize: 40,
-    fontWeight: "600",
-    fontFamily: "Roboto",
-    letterSpacing: 0.5,
   },
 
   logoutButton: {
@@ -123,5 +117,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-
 });

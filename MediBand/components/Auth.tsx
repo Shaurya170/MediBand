@@ -1,27 +1,23 @@
 import { supabase } from "@/utils/supabase";
-import { Checkbox } from "expo-checkbox";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
   AppState,
   AppStateStatus,
   StyleSheet,
-  Text,
+  TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { default as Colors } from "../styles/colors";
+import colors from "../styles/colors";
 import MyButton from "./MyButton";
-import TextField from "./TextField";
+
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showText, setShowText] = useState(false);
 
-  /*
-    Supabase uses background token refresh.
-    We start/stop it based on app state.
-  */
   useEffect(() => {
     const handleAppStateChange = (nextState: AppStateStatus) => {
       if (nextState === "active") {
@@ -43,9 +39,7 @@ const Auth = () => {
     }
 
     return () => {
-      if (typeof subscription?.remove === "function") {
-        subscription.remove();
-      }
+      subscription.remove();
       try {
         supabase.auth.stopAutoRefresh();
       } catch {}
@@ -58,9 +52,7 @@ const Auth = () => {
       password,
     });
 
-    if (error) {
-      Alert.alert(error.message);
-    }
+    if (error) Alert.alert(error.message);
   }
 
   async function signUpWithEmail() {
@@ -69,75 +61,64 @@ const Auth = () => {
       password,
     });
 
-    if (error) {
-      Alert.alert(error.message);
-    }
+    if (error) Alert.alert(error.message);
   }
 
-  const handleAuthSignIn = () => {
-    const hasNumber = /\d/.test(password); //used chatgpt --> https://chatgpt.com/s/t_697cb41288bc8191a18d989ad8570283
-
-    if (email.length >= 6 && password.length >= 6 && hasNumber) {
-      signInWithEmail();
-      console.log("signed in");
-    } else {
-      console.log("your email or password is not long enough");
-    }
-  };
-
-  const handleAuthSignUp = () => {
-    const hasNumber = /\d/.test(password);
-
-    if (email.length >= 6 && password.length >= 6 && hasNumber) {
-      signUpWithEmail();
-      console.log("signed up");
-    } else {
-      console.log("your email or password is not long enough");
-    }
-  };
-
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.container}>
-        <View>
-          <TextField
-            placeholder="email"
-            value={email}
-            onChangeText={setEmail}
-          />
-          <TextField
-            placeholder="password"
+    <View style={styles.container}>
+      <View style={styles.form}>
+        {/* EMAIL */}
+        <TextInput
+          placeholder="Email"
+          placeholderTextColor={colors.subText}
+          value={email}
+          onChangeText={setEmail}
+          style={styles.input}
+        />
+
+        {/* PASSWORD WITH EYE ICON */}
+        <View style={styles.passwordContainer}>
+          <TextInput
+            placeholder="Password"
+            placeholderTextColor={colors.subText}
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!showText}
+            style={styles.input}
           />
+
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => setShowText(!showText)}
+          >
+            <Ionicons
+              name={showText ? "eye-off" : "eye"}
+              size={22}
+              color={colors.subText}
+            />
+          </TouchableOpacity>
         </View>
-        <View style={styles.checkContainer}>
-          <Text>Show Password</Text>
-          <Checkbox
-            value={showText}
-            onValueChange={setShowText}
-            color={showText ? "#1F9D00" : undefined}
-          />
-        </View>
+
+        {/* BUTTONS */}
         <View style={styles.buttonContainer}>
           <MyButton
             title="Sign Up"
-            onPress={handleAuthSignUp}
-            color={Colors.button}
-            textColor={Colors.text}
-            viewStyle={styles.buttonStyle}
+            onPress={signUpWithEmail}
+            color={colors.button}
+            textColor={colors.text}
+            viewStyle={styles.button}
           />
+
           <MyButton
             title="Login"
-            onPress={handleAuthSignIn}
-            color={Colors.button}
-            textColor={Colors.text}
-            viewStyle={styles.buttonStyle}
+            onPress={signInWithEmail}
+            color={colors.button}
+            textColor={colors.text}
+            viewStyle={styles.button}
           />
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -145,31 +126,43 @@ export default Auth;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.background,
-    flex: 1,
+    width: "100%",
     alignItems: "center",
+  },
+
+  form: {
+    width: "100%",
+    gap: 15,
+  },
+
+  input: {
+    width: "100%",
+    height: 50,
+    backgroundColor: colors.textField,
+    borderRadius: 12,
+    paddingHorizontal: 15,
+    color: colors.text,
+  },
+
+  passwordContainer: {
+    width: "100%",
     justifyContent: "center",
-    flexDirection: "column",
   },
-  checkContainer: {
-    flexDirection: "row",
-    padding: 20,
-    gap: 5,
+
+  eyeIcon: {
+    position: "absolute",
+    right: 15,
   },
+
   buttonContainer: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
+    justifyContent: "space-between",
+    marginTop: 10,
   },
-  buttonStyle: {
-    height: 40,
-    width: 150,
-    borderWidth: 3,
-    borderColor: "black",
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-    textAlign: "center",
+
+  button: {
+    width: "48%",
+    height: 45,
+    borderRadius: 12,
   },
 });

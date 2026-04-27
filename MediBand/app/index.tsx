@@ -2,7 +2,16 @@ import Auth from "@/components/Auth";
 import colors from "@/styles/colors";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useAuth } from "../components/AuthProvider";
 
 export default function Index() {
@@ -16,7 +25,11 @@ export default function Index() {
   }, [router, session]);
 
   if (isLoading) {
-    return <ActivityIndicator style={{ marginTop: 40 }} />;
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color={colors.accent} />
+      </View>
+    );
   }
 
   if (session?.user) {
@@ -24,41 +37,63 @@ export default function Index() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>MediBand</Text>
-      <Auth />
-    </View>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={styles.header}>MediBand</Text>
+
+        <Image
+          source={require("../assets/images/MediBand_logo.png")}
+          style={styles.logo}
+        />
+
+        <View style={styles.card}>
+          <Auth />
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#212922",
+    flexGrow: 1,
+    backgroundColor: colors.background,
     alignItems: "center",
+    paddingTop: 80,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+
+  loaderContainer: {
+    flex: 1,
     justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.background,
   },
 
   header: {
-    fontSize: 70,
-    fontFamily: "Jua",
+    fontSize: 42,
+    fontWeight: "700",
     color: colors.text,
+    marginBottom: 10,
   },
 
-  buttonContainer: {
-    margin: 10,
-    padding: 8,
-    alignItems: "center",
-    justifyContent: "center",
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 20,
   },
 
-  buttonStyle: {
-    backgroundColor: colors.button,
-  },
-
-  buttonText: {
-    color: colors.text,
-    fontFamily: "Jua",
-    fontSize: 30,
+  card: {
+    width: "100%",
+    backgroundColor: colors.card,
+    padding: 20,
+    borderRadius: 20,
   },
 });
