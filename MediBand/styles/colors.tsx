@@ -9,6 +9,7 @@ const colors = {
   subText: "#A7C1B7", // NEW: secondary text
   border: "#2A3F37", // NEW: subtle borders
   danger: "#FF5A5F", // better red for delete
+  secondaryText: "#64748B",
 };
 
 export default colors;

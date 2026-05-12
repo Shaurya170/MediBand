@@ -5,15 +5,17 @@ import {
   Text,
   TextStyle,
   TouchableOpacity,
+  View,
   ViewStyle,
 } from "react-native";
 import colors from "../styles/colors";
 
 type PropsType = {
-  title: string;
+  title?: string;
   onPress: () => void;
   color?: string;
   textColor?: string;
+  icon?: React.ReactNode;
   viewStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
 };
@@ -23,6 +25,7 @@ const MyButton: React.FC<PropsType> = ({
   onPress,
   color = colors.button,
   textColor = colors.text,
+  icon,
   viewStyle,
   textStyle,
 }) => {
@@ -32,9 +35,15 @@ const MyButton: React.FC<PropsType> = ({
       activeOpacity={0.7}
       style={[styles.button, { backgroundColor: color }, viewStyle]}
     >
-      <Text style={[styles.buttonText, { color: textColor }, textStyle]}>
-        {title}
-      </Text>
+      <View style={styles.content}>
+        {icon}
+
+        {title && (
+          <Text style={[styles.buttonText, { color: textColor }, textStyle]}>
+            {title}
+          </Text>
+        )}
+      </View>
     </TouchableOpacity>
   );
 };
@@ -48,6 +57,13 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  content: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
   },
 
   buttonText: {

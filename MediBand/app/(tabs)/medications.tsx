@@ -2,6 +2,7 @@ import MyButton from "@/components/MyButton";
 import TextField from "@/components/TextField";
 import colors from "@/styles/colors";
 import { supabase } from "@/utils/supabase";
+import { Feather } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { Alert, FlatList, Modal, StyleSheet, Text, View } from "react-native";
 
@@ -23,7 +24,12 @@ export default function Medications() {
 
   useEffect(() => {
     fetchMedications();
-    subscribeToChanges();
+
+    const unsubscribe = subscribeToChanges();
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   async function fetchMedications() {
@@ -45,7 +51,11 @@ export default function Medications() {
       .channel("medication-realtime")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "medications" },
+        {
+          event: "*",
+          schema: "public",
+          table: "medications",
+        },
         (payload) => {
           if (payload.eventType === "INSERT") {
             setMedications((prev) => [...prev, payload.new as Medication]);
@@ -111,7 +121,10 @@ export default function Medications() {
       "Delete Medication",
       "Are you sure you want to delete this medication?",
       [
-        { text: "Cancel", style: "cancel" },
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
         {
           text: "Delete",
           style: "destructive",
@@ -134,25 +147,27 @@ export default function Medications() {
   function renderMedication({ item }: { item: Medication }) {
     return (
       <View style={styles.card}>
-        <Text style={styles.medText}>{item.medication}</Text>
+        <View>
+          <Text style={styles.medText}>{item.medication}</Text>
 
-        <Text style={styles.subText}>
-          {item.dosage_amount} {item.dosage_unit}
-        </Text>
+          <Text style={styles.subText}>
+            {item.dosage_amount} {item.dosage_unit}
+          </Text>
+        </View>
 
-        <View style={styles.buttonRow}>
+        <View style={styles.actionButtons}>
           <MyButton
-            title="Edit"
+            icon={<Feather name="edit-2" size={16} color={colors.accent} />}
             onPress={() => openEdit(item)}
-            viewStyle={styles.smallButton}
+            color="white"
+            viewStyle={styles.iconButton}
           />
 
           <MyButton
-            title="Delete"
+            icon={<Feather name="trash-2" size={16} color="white" />}
             onPress={() => confirmDelete(item.id)}
-            viewStyle={styles.smallButton}
-            color="#ff3b30"
-            textColor="white"
+            color="#ff5c5c"
+            viewStyle={styles.iconButton}
           />
         </View>
       </View>
@@ -161,8 +176,6 @@ export default function Medications() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Medications</Text>
-
       <FlatList
         style={{ width: "100%" }}
         contentContainerStyle={styles.listContent}
@@ -226,54 +239,80 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 34,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.text,
-    marginBottom: 20,
+    marginBottom: 24,
   },
 
   listContent: {
     alignItems: "center",
     paddingBottom: 40,
+    width: "100%",
   },
 
   card: {
     width: "90%",
-    backgroundColor: "white",
-    padding: 18,
-    borderRadius: 20,
-    marginBottom: 15,
+    backgroundColor: colors.card,
+    padding: 20,
+    borderRadius: 24,
+    marginBottom: 16,
+    minHeight: 150,
 
-    // iOS shadow
     shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
 
-    // Android shadow
     elevation: 3,
+  },
+  actionButtons: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 10,
+    marginTop: 25,
+  },
+  iconButton: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+
+    elevation: 2,
   },
 
   medText: {
-    fontSize: 20,
-    fontWeight: "600",
-    marginBottom: 4,
+    fontSize: 22,
+    fontWeight: "700",
+    color: colors.text,
+    marginBottom: 6,
   },
 
   subText: {
     fontSize: 16,
-    color: "#666",
-    marginBottom: 12,
+    color: colors.secondaryText,
+    marginBottom: 16,
   },
 
   buttonRow: {
+    marginTop: 10,
     flexDirection: "row",
     justifyContent: "space-between",
   },
 
   smallButton: {
     width: 120,
-    height: 40,
-    borderRadius: 12,
+    height: 42,
+    borderRadius: 14,
     borderWidth: 1.5,
   },
 
@@ -281,26 +320,31 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.3)",
+    backgroundColor: "rgba(0,0,0,0.35)",
   },
 
   modalCard: {
     width: "85%",
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 20,
+    backgroundColor: colors.card,
+    padding: 22,
+    borderRadius: 24,
 
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 15,
-    shadowOffset: { width: 0, height: 5 },
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+
     elevation: 5,
   },
 
   modalTitle: {
-    fontSize: 22,
-    fontWeight: "600",
-    marginBottom: 15,
+    fontSize: 24,
+    fontWeight: "700",
+    color: colors.text,
+    marginBottom: 18,
     textAlign: "center",
   },
 });

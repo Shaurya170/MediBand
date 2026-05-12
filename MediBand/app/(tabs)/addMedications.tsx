@@ -9,7 +9,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
 } from "react-native";
 
 export default function AddMedication() {
@@ -59,8 +58,6 @@ export default function AddMedication() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.title}>Add Medication</Text>
-
         <TextField
           placeholder="Medication Name"
           value={medication}
