@@ -1,3 +1,4 @@
+import { useAuth } from "@/components/AuthProvider"; // ← Add this
 import colors from "@/styles/colors";
 import { supabase } from "@/utils/supabase";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -25,20 +26,21 @@ function getTitleFromPath(pathname: string) {
 export default function AppHeader() {
   const pathname = usePathname();
   const title = getTitleFromPath(pathname);
+  const { session } = useAuth(); // ← Add this
 
   async function handleLogout() {
     try {
       const { error } = await supabase.auth.signOut();
 
       if (error) {
-        Alert.alert("Logout failed", error.message);
+        Alert.alert("Logout Failed", error.message);
         return;
       }
 
-      // Send user back to login screen
+      // Clear session and redirect to login
       router.replace("/");
     } catch (err: any) {
-      Alert.alert("Logout failed", err?.message ?? "Unexpected error");
+      Alert.alert("Logout Failed", err?.message ?? "Something went wrong");
     }
   }
 
@@ -58,13 +60,15 @@ export default function AppHeader() {
           {title}
         </Text>
 
-        <TouchableHighlight
-          onPress={handleLogout}
-          underlayColor={colors.accent}
-          style={styles.logoutButton}
-        >
-          <MaterialIcons name="logout" size={26} color={colors.text} />
-        </TouchableHighlight>
+        {session && ( // ← Only show logout when logged in
+          <TouchableHighlight
+            onPress={handleLogout}
+            underlayColor={colors.accent}
+            style={styles.logoutButton}
+          >
+            <MaterialIcons name="logout" size={26} color={colors.text} />
+          </TouchableHighlight>
+        )}
       </View>
     </View>
   );

@@ -18,6 +18,8 @@ type PropsType = {
   icon?: React.ReactNode;
   viewStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
+  fullWidth?: boolean; // New: make button full width
+  height?: number; // New: custom height
 };
 
 const MyButton: React.FC<PropsType> = ({
@@ -28,16 +30,22 @@ const MyButton: React.FC<PropsType> = ({
   icon,
   viewStyle,
   textStyle,
+  fullWidth = false,
+  height = 50,
 }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={0.7}
-      style={[styles.button, { backgroundColor: color }, viewStyle]}
+      activeOpacity={0.75}
+      style={[
+        styles.button,
+        { backgroundColor: color, height },
+        fullWidth && styles.fullWidth,
+        viewStyle,
+      ]}
     >
       <View style={styles.content}>
         {icon}
-
         {title && (
           <Text style={[styles.buttonText, { color: textColor }, textStyle]}>
             {title}
@@ -52,11 +60,14 @@ export default MyButton;
 
 const styles = StyleSheet.create({
   button: {
-    height: 50,
-    width: 180,
-    borderRadius: 25,
+    borderRadius: 16, // Modern rounded look
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 16,
+  },
+
+  fullWidth: {
+    width: "100%",
   },
 
   content: {
@@ -67,7 +78,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "600",
   },
 });

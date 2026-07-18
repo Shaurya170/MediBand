@@ -20,7 +20,7 @@ export default function Index() {
 
   useEffect(() => {
     if (session?.user) {
-      router.replace("/(tabs)");
+      router.replace("/(tabs)/about");
     }
   }, [router, session]);
 

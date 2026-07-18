@@ -7,47 +7,56 @@ type InputProps = {
   onChangeText: (text: string) => void;
   value: string;
   secureTextEntry?: boolean;
+  keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
+  multiline?: boolean;
+  numberOfLines?: number;
+  style?: any; // for custom styling if needed
 };
 
 const TextField = ({
   placeholder,
   onChangeText,
   value,
-  secureTextEntry,
+  secureTextEntry = false,
+  keyboardType = "default",
+  autoCapitalize = "sentences",
+  multiline = false,
+  numberOfLines,
+  style,
 }: InputProps) => {
   return (
     <View style={styles.textInputContainer}>
       <TextInput
-        style={[styles.textInput, { height: 52 }, { width: 200 }]}
+        style={[styles.textInput, style]}
         placeholder={placeholder}
-        placeholderTextColor={colors.text}
+        placeholderTextColor={colors.secondaryText} // Better contrast
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}
+        keyboardType={keyboardType}
+        autoCapitalize={autoCapitalize}
+        multiline={multiline}
+        numberOfLines={numberOfLines}
+        autoCorrect={false}
       />
     </View>
   );
 };
+
 export default TextField;
 
 const styles = StyleSheet.create({
   textInputContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 3,
+    width: "100%",
+    marginBottom: 16,
   },
   textInput: {
     backgroundColor: colors.textField,
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingBottom: 5,
-    alignItems: "center",
-    justifyContent: "center",
+    height: 52,
+    paddingHorizontal: 16,
     borderRadius: 12,
-  },
-  text: {
-    borderColor: colors.accent,
-    alignItems: "center",
-    justifyContent: "center",
+    fontSize: 16,
+    color: colors.text,
   },
 });

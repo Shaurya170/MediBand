@@ -43,9 +43,14 @@ export default function AddMedication() {
     } else {
       Alert.alert("Success", "Medication added");
 
+      // Reset form
       setMedication("");
       setDosageAmount("");
       setDosageUnit("");
+
+      // Optional: Navigate back to Medications screen
+      // (Uncomment if you are using navigation)
+      // navigation.goBack();
     }
   };
 
@@ -94,13 +99,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: colors.background,
     gap: 20,
-    paddingBottom: 40, // prevents button being hidden
-  },
-
-  title: {
-    fontSize: 50,
-    color: colors.text,
-    marginBottom: 30,
+    paddingBottom: 40,
   },
 
   button: {

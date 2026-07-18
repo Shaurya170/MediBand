@@ -3,7 +3,8 @@ import TextField from "@/components/TextField";
 import colors from "@/styles/colors";
 import { supabase } from "@/utils/supabase";
 import { Feather } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native"; // ← Add this import
+import React, { useCallback, useEffect, useState } from "react";
 import { Alert, FlatList, Modal, StyleSheet, Text, View } from "react-native";
 
 type Medication = {
@@ -22,24 +23,39 @@ export default function Medications() {
   const [amount, setAmount] = useState("");
   const [unit, setUnit] = useState("");
 
+  // Fetch when screen comes into focus (important for tabs)
+  useFocusEffect(
+    useCallback(() => {
+      fetchMedications();
+    }, [])
+  );
+
+  // Also run once when component mounts
   useEffect(() => {
-    fetchMedications();
-
     const unsubscribe = subscribeToChanges();
-
     return () => {
       unsubscribe();
     };
   }, []);
 
   async function fetchMedications() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      console.log("No user found");
+      return;
+    }
+
     const { data, error } = await supabase
       .from("medications")
       .select("*")
-      .order("created_at");
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: true });
 
     if (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error", error.message);
       return;
     }
 
@@ -57,13 +73,18 @@ export default function Medications() {
           table: "medications",
         },
         (payload) => {
+          console.log("Realtime event:", payload.eventType);
+
           if (payload.eventType === "INSERT") {
-            setMedications((prev) => [...prev, payload.new as Medication]);
+            setMedications((prev) => {
+              if (prev.some((m) => m.id === payload.new.id)) return prev;
+              return [...prev, payload.new as Medication];
+            });
           }
 
           if (payload.eventType === "DELETE") {
             setMedications((prev) =>
-              prev.filter((m) => m.id !== payload.old.id)
+              prev.filter((m) => m.id !== payload.old?.id)
             );
           }
 
@@ -78,9 +99,7 @@ export default function Medications() {
       )
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => supabase.removeChannel(channel);
   }
 
   function openEdit(med: Medication) {
@@ -100,6 +119,7 @@ export default function Medications() {
       dosage_unit: unit,
     };
 
+    // Optimistic update - update UI immediately
     setMedications((prev) =>
       prev.map((m) => (m.id === editId ? { ...m, ...updated } : m))
     );
@@ -110,37 +130,36 @@ export default function Medications() {
       .eq("id", editId);
 
     if (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error", error.message);
+      // Revert by refreshing if failed
+      fetchMedications();
     }
 
     setModalVisible(false);
+    setEditId(null);
   }
 
   function confirmDelete(id: string) {
-    Alert.alert(
-      "Delete Medication",
-      "Are you sure you want to delete this medication?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => deleteMedication(id),
-        },
-      ]
-    );
+    Alert.alert("Delete Medication", "Are you sure?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => deleteMedication(id),
+      },
+    ]);
   }
 
   async function deleteMedication(id: string) {
+    // Remove from screen immediately (optimistic update)
     setMedications((prev) => prev.filter((m) => m.id !== id));
 
     const { error } = await supabase.from("medications").delete().eq("id", id);
 
     if (error) {
-      Alert.alert(error.message);
+      Alert.alert("Error", error.message);
+      // If delete fails, refresh the full list
+      fetchMedications();
     }
   }
 
@@ -149,7 +168,6 @@ export default function Medications() {
       <View style={styles.card}>
         <View>
           <Text style={styles.medText}>{item.medication}</Text>
-
           <Text style={styles.subText}>
             {item.dosage_amount} {item.dosage_unit}
           </Text>
@@ -157,14 +175,14 @@ export default function Medications() {
 
         <View style={styles.actionButtons}>
           <MyButton
-            icon={<Feather name="edit-2" size={16} color={colors.accent} />}
+            icon={<Feather name="edit-2" size={20} color={colors.accent} />}
             onPress={() => openEdit(item)}
             color="white"
             viewStyle={styles.iconButton}
           />
 
           <MyButton
-            icon={<Feather name="trash-2" size={16} color="white" />}
+            icon={<Feather name="trash-2" size={20} color="white" />}
             onPress={() => confirmDelete(item.id)}
             color="#ff5c5c"
             viewStyle={styles.iconButton}
@@ -185,7 +203,6 @@ export default function Medications() {
         showsVerticalScrollIndicator={false}
       />
 
-      {/* MODAL */}
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalBackground}>
           <View style={styles.modalCard}>
@@ -196,13 +213,11 @@ export default function Medications() {
               value={name}
               onChangeText={setName}
             />
-
             <TextField
               placeholder="Dosage Amount"
               value={amount}
               onChangeText={setAmount}
             />
-
             <TextField
               placeholder="Dosage Unit"
               value={unit}
@@ -215,10 +230,12 @@ export default function Medications() {
                 onPress={saveEdit}
                 viewStyle={styles.smallButton}
               />
-
               <MyButton
                 title="Cancel"
-                onPress={() => setModalVisible(false)}
+                onPress={() => {
+                  setModalVisible(false);
+                  setEditId(null);
+                }}
                 viewStyle={styles.smallButton}
               />
             </View>
@@ -233,61 +250,45 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    alignItems: "center",
     paddingTop: 60,
   },
 
-  title: {
-    fontSize: 34,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 24,
-  },
-
   listContent: {
-    alignItems: "center",
+    paddingHorizontal: 10,
     paddingBottom: 40,
     width: "100%",
   },
 
   card: {
-    width: "90%",
+    width: "100%",
     backgroundColor: colors.card,
     padding: 20,
     borderRadius: 24,
     marginBottom: 16,
-    minHeight: 150,
-
+    minHeight: 140,
     shadowColor: "#000",
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.07,
     shadowRadius: 12,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
+
   actionButtons: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    gap: 10,
+    gap: 12,
     marginTop: 25,
   },
+
   iconButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-
+    width: 48,
+    height: 48,
+    borderRadius: 14,
     shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-
-    elevation: 2,
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
 
   medText: {
@@ -328,15 +329,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     padding: 22,
     borderRadius: 24,
-
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 15,
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-
+    shadowOffset: { width: 0, height: 5 },
     elevation: 5,
   },
 
