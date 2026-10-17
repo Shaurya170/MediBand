@@ -20,6 +20,7 @@ type PropsType = {
   textStyle?: StyleProp<TextStyle>;
   fullWidth?: boolean; // New: make button full width
   height?: number; // New: custom height
+  disabled?: boolean;
 };
 
 const MyButton: React.FC<PropsType> = ({
@@ -32,15 +33,18 @@ const MyButton: React.FC<PropsType> = ({
   textStyle,
   fullWidth = false,
   height = 50,
+  disabled = false,
 }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.75}
+      disabled={disabled}
       style={[
         styles.button,
         { backgroundColor: color, height },
         fullWidth && styles.fullWidth,
+        disabled && styles.disabled,
         viewStyle,
       ]}
     >
@@ -68,6 +72,10 @@ const styles = StyleSheet.create({
 
   fullWidth: {
     width: "100%",
+  },
+
+  disabled: {
+    opacity: 0.5,
   },
 
   content: {

@@ -2,13 +2,15 @@ import MyButton from "@/components/MyButton";
 import TextField from "@/components/TextField";
 import colors from "@/styles/colors";
 import { supabase } from "@/utils/supabase";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 export default function AddMedication() {
@@ -43,14 +45,9 @@ export default function AddMedication() {
     } else {
       Alert.alert("Success", "Medication added");
 
-      // Reset form
       setMedication("");
       setDosageAmount("");
       setDosageUnit("");
-
-      // Optional: Navigate back to Medications screen
-      // (Uncomment if you are using navigation)
-      // navigation.goBack();
     }
   };
 
@@ -63,30 +60,35 @@ export default function AddMedication() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <TextField
-          placeholder="Medication Name"
-          value={medication}
-          onChangeText={setMedication}
-        />
+        <View style={styles.card}>
+          <Text style={styles.title}>Add New Medication</Text>
 
-        <TextField
-          placeholder="Dosage Amount"
-          value={dosageAmount}
-          onChangeText={setDosageAmount}
-        />
+          <TextField
+            placeholder="Medication Name"
+            value={medication}
+            onChangeText={setMedication}
+          />
 
-        <TextField
-          placeholder="Dosage Unit (mg, ml, pills)"
-          value={dosageUnit}
-          onChangeText={setDosageUnit}
-        />
+          <TextField
+            placeholder="Dosage Amount"
+            value={dosageAmount}
+            onChangeText={setDosageAmount}
+          />
 
-        <MyButton
-          title="Add Medication"
-          onPress={addMedication}
-          viewStyle={styles.button}
-          textStyle={styles.buttonText}
-        />
+          <TextField
+            placeholder="Dosage Unit (mg, ml, pills)"
+            value={dosageUnit}
+            onChangeText={setDosageUnit}
+          />
+
+          <MyButton
+            title="Add Medication"
+            onPress={addMedication}
+            fullWidth
+            height={56}
+            viewStyle={{ marginTop: 20 }}
+          />
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -95,20 +97,29 @@ export default function AddMedication() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    alignItems: "center",
-    justifyContent: "center",
     backgroundColor: colors.background,
-    gap: 20,
+    paddingTop: 60,
+    paddingHorizontal: 16,
     paddingBottom: 40,
   },
 
-  button: {
-    width: 200,
-    height: 60,
-    borderRadius: 15,
+  card: {
+    backgroundColor: colors.card,
+    padding: 24,
+    borderRadius: 24,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
 
-  buttonText: {
-    fontSize: 22,
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: colors.text,
+    marginBottom: 24,
+    textAlign: "center",
   },
 });

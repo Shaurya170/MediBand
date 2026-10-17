@@ -1,7 +1,6 @@
 import MediBandLogo from "@/components/MediBandLogo";
 import MyButton from "@/components/MyButton";
 import colors from "@/styles/colors";
-import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function About() {

@@ -1,11 +1,12 @@
 import { supabase } from "@/utils/supabase";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   AppState,
   AppStateStatus,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -17,6 +18,7 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showText, setShowText] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const handleAppStateChange = (nextState: AppStateStatus) => {
@@ -47,21 +49,56 @@ const Auth = () => {
   }, []);
 
   async function signInWithEmail() {
+    if (!email || !password) {
+      Alert.alert("Missing info", "Please enter an email and password.");
+      return;
+    }
+
+    setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    setLoading(false);
 
     if (error) Alert.alert(error.message);
   }
 
   async function signUpWithEmail() {
+    if (!email || !password) {
+      Alert.alert("Missing info", "Please enter an email and password.");
+      return;
+    }
+
+    setLoading(true);
     const { error } = await supabase.auth.signUp({
       email,
       password,
     });
+    setLoading(false);
 
     if (error) Alert.alert(error.message);
+  }
+
+  async function forgotPassword() {
+    if (!email) {
+      Alert.alert(
+        "Missing info",
+        "Enter your email above first, then tap Forgot Password."
+      );
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    setLoading(false);
+
+    if (error) Alert.alert("Error", error.message);
+    else
+      Alert.alert(
+        "Check your email",
+        "We sent you a link to reset your password."
+      );
   }
 
   return (
@@ -102,21 +139,27 @@ const Auth = () => {
         {/* BUTTONS */}
         <View style={styles.buttonContainer}>
           <MyButton
-            title="Sign Up"
+            title={loading ? "..." : "Sign Up"}
             onPress={signUpWithEmail}
             color={colors.button}
             textColor={colors.text}
             viewStyle={styles.button}
+            disabled={loading}
           />
 
           <MyButton
-            title="Login"
+            title={loading ? "..." : "Login"}
             onPress={signInWithEmail}
             color={colors.button}
             textColor={colors.text}
             viewStyle={styles.button}
+            disabled={loading}
           />
         </View>
+
+        <TouchableOpacity onPress={forgotPassword} disabled={loading}>
+          <Text style={styles.forgotPassword}>Forgot password?</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -164,5 +207,13 @@ const styles = StyleSheet.create({
     width: "48%",
     height: 45,
     borderRadius: 12,
+  },
+
+  forgotPassword: {
+    color: colors.subText,
+    textAlign: "center",
+    marginTop: 14,
+    fontSize: 14,
+    textDecorationLine: "underline",
   },
 });

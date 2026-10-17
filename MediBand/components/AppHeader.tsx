@@ -1,43 +1,27 @@
-import { useAuth } from "@/components/AuthProvider"; // ← Add this
+import { useAuth } from "@/components/AuthProvider";
 import colors from "@/styles/colors";
 import { supabase } from "@/utils/supabase";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { router, usePathname } from "expo-router";
+import { router } from "expo-router";
 import {
   Alert,
-  Image,
+  Platform,
   StyleSheet,
   Text,
-  TouchableHighlight,
+  TouchableOpacity,
   View,
 } from "react-native";
 
-function getTitleFromPath(pathname: string) {
-  if (pathname === "/") return "Welcome";
-  if (pathname.includes("index")) return "Home";
-  if (pathname.includes("addMedications")) return "Add Medication";
-  if (pathname.includes("medications")) return "Medications";
-  if (pathname.includes("editProfile")) return "Edit Profile";
-  if (pathname.includes("about")) return "About";
-
-  return "App";
-}
-
 export default function AppHeader() {
-  const pathname = usePathname();
-  const title = getTitleFromPath(pathname);
-  const { session } = useAuth(); // ← Add this
+  const { session } = useAuth();
 
   async function handleLogout() {
     try {
       const { error } = await supabase.auth.signOut();
-
       if (error) {
         Alert.alert("Logout Failed", error.message);
         return;
       }
-
-      // Clear session and redirect to login
       router.replace("/");
     } catch (err: any) {
       Alert.alert("Logout Failed", err?.message ?? "Something went wrong");
@@ -46,28 +30,23 @@ export default function AppHeader() {
 
   return (
     <View style={styles.container}>
-      {/* LEFT SIDE (LOGO) */}
-      <View style={styles.leftContainer}>
-        <Image
-          source={require("../assets/images/MediBand_logo.png")}
-          style={styles.logo}
-        />
-      </View>
+      <View style={styles.row}>
+        {/* Left spacer balances the logout button so the title stays centered */}
+        {session && <View style={styles.sideSpacer} />}
 
-      {/* RIGHT SIDE (TITLE + LOGOUT) */}
-      <View style={styles.rightContainer}>
-        <Text style={styles.title} numberOfLines={2}>
-          {title}
-        </Text>
+        <View style={styles.centerContainer}>
+          <Text style={styles.appName}>MediBand</Text>
+        </View>
 
-        {session && ( // ← Only show logout when logged in
-          <TouchableHighlight
+        {/* Logout Button */}
+        {session && (
+          <TouchableOpacity
             onPress={handleLogout}
-            underlayColor={colors.accent}
             style={styles.logoutButton}
+            activeOpacity={0.7}
           >
             <MaterialIcons name="logout" size={26} color={colors.text} />
-          </TouchableHighlight>
+          </TouchableOpacity>
         )}
       </View>
     </View>
@@ -77,47 +56,39 @@ export default function AppHeader() {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    height: 120,
     backgroundColor: colors.card,
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === "ios" ? 48 : 20,
+    paddingBottom: 16,
+  },
+
+  row: {
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    paddingTop: 20,
   },
 
-  leftContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  rightContainer: {
+  centerContainer: {
     flex: 1,
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-end",
-    gap: 12,
+    justifyContent: "center",
   },
 
-  title: {
+  sideSpacer: {
+    width: 46,
+  },
+
+  appName: {
+    fontSize: 34,
+    fontWeight: "700",
     color: colors.text,
-    fontSize: 32,
-    fontWeight: "600",
-    fontFamily: "Gill Sans",
-    letterSpacing: 0.5,
-    flexShrink: 1,
-  },
-
-  logo: {
-    width: 90,
-    height: 90,
   },
 
   logoutButton: {
+    width: 46,
+    height: 46,
+    borderRadius: 12,
     backgroundColor: colors.button,
-    borderRadius: 8,
-    width: 50,
-    height: 50,
     alignItems: "center",
     justifyContent: "center",
   },

@@ -98,6 +98,19 @@ export default function TabsLayout() {
             ),
           }}
         />
+        <Tabs.Screen
+          name="alarms"
+          options={{
+            tabBarLabel: "Alarms",
+            tabBarIcon: ({ focused, color }) => (
+              <Ionicons
+                name={focused ? "alarm" : "alarm-outline"}
+                size={24}
+                color={color}
+              />
+            ),
+          }}
+        />
       </Tabs>
     </View>
   );

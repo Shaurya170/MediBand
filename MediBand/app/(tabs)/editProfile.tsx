@@ -2,7 +2,7 @@ import MyButton from "@/components/MyButton";
 import TextField from "@/components/TextField";
 import colors from "@/styles/colors";
 import { supabase } from "@/utils/supabase";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function EditProfile() {
