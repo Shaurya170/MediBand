@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.shaurya170.mediband"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,6 +27,8 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "./plugins/withSceneLifecycle",
+      "./plugins/withMediBandAlarms",
       "expo-router",
       [
         "expo-splash-screen",
@@ -39,6 +42,7 @@
           }
         }
       ],
+      "./plugins/withoutPushEntitlement",
       [
         "expo-notifications",
         {
