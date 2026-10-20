@@ -1,5 +1,11 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
+import {
+  cancelAlarmKitAlarm,
+  isAlarmKitSupported,
+  requestAlarmAuthorization,
+  scheduleWeeklyAlarm,
+} from "./alarmKit";
 
 // Sunday = 1 ... Saturday = 7, per expo-notifications' WeeklyTriggerInput.
 const DAY_NAME_TO_WEEKDAY: Record<string, number> = {
@@ -52,6 +58,11 @@ type AlarmForNotification = {
 };
 
 export async function cancelAlarmNotifications(alarmId: string) {
+  await cancelAlarmKitAlarm(alarmId);
+  await cancelNotificationReminders(alarmId);
+}
+
+async function cancelNotificationReminders(alarmId: string) {
   await Promise.all(
     Object.values(DAY_NAME_TO_WEEKDAY).map((weekday) =>
       Notifications.cancelScheduledNotificationAsync(
@@ -62,6 +73,29 @@ export async function cancelAlarmNotifications(alarmId: string) {
 }
 
 export async function scheduleAlarmNotifications(alarm: AlarmForNotification) {
+  const title = alarm.medication_name
+    ? `Time to take ${alarm.medication_name}`
+    : "Time to take your medication";
+
+  // On iOS 26+, use AlarmKit so the alarm keeps ringing until Stop or Snooze.
+  if (await isAlarmKitSupported()) {
+    // Remove notification reminders scheduled before MediBand used AlarmKit.
+    await cancelNotificationReminders(alarm.id);
+
+    if (!alarm.enabled || alarm.days.length === 0) {
+      await cancelAlarmKitAlarm(alarm.id);
+      return;
+    }
+    if (!(await requestAlarmAuthorization())) return;
+
+    const [hour, minute] = alarm.time.split(":").map(Number);
+    const weekdays = alarm.days
+      .map((day) => DAY_NAME_TO_WEEKDAY[day])
+      .filter((weekday): weekday is number => weekday !== undefined);
+    await scheduleWeeklyAlarm(alarm.id, title, hour, minute, weekdays);
+    return;
+  }
+
   // Clear any previously scheduled times for this alarm before re-scheduling.
   await cancelAlarmNotifications(alarm.id);
 
@@ -82,9 +116,7 @@ export async function scheduleAlarmNotifications(alarm: AlarmForNotification) {
       identifier: `${alarm.id}-${weekday}`,
       content: {
         title: "Medication Reminder",
-        body: alarm.medication_name
-          ? `Time to take ${alarm.medication_name}`
-          : "Time to take your medication",
+        body: title,
         sound: "alarm.wav",
       },
       trigger: {

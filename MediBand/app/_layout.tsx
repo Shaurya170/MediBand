@@ -1,4 +1,5 @@
 import { AuthProvider, useAuth } from "@/components/AuthProvider";
+import SnoozePrompt from "@/components/SnoozePrompt";
 import { Slot, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
 
@@ -26,6 +27,7 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <RootLayoutNav />
+      <SnoozePrompt />
     </AuthProvider>
   );
 }
