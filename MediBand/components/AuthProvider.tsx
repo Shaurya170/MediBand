@@ -33,8 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })();
 
     // Listen for auth changes
-    const { data } = supabase.auth.onAuthStateChange((event, newSession) => {
-      console.log("🔐 Auth Event:", event); // ← Added this
+    const { data } = supabase.auth.onAuthStateChange((_event, newSession) => {
       if (!mounted) return;
       setSession(newSession ?? null);
     });
